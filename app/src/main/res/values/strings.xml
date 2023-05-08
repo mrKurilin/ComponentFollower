@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">ComponentFollower</string>
+    <string name="file_size_in_mb">%1$.2f mb</string>
+    <string name="exit">Выйти</string>
+    <string name="permissions">Дать разрешения</string>
+    <string name="permissions_rationale">Для работы приложения необходимы следующие разрешения:\n
+    %1$s
+    </string>
+    <string name="open_settings">Открыть настройки</string>
+
+    <plurals name="files">
+        <item quantity="one">%1$d файл</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файлов</item>
+    </plurals>
+
+</resources>
