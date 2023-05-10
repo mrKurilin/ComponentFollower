@@ -7,7 +7,6 @@ import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.RadioGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +24,6 @@ class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var radioGroup: RadioGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +36,6 @@ class MainActivity : AppCompatActivity() {
                 updateUI(uiState)
             }
         }
-
-        radioGroup = findViewById(R.id.sort_group)
 
         if (mainViewModel.deniedPermissions(this).isNotEmpty()) {
             requestPermissions(mainViewModel.deniedPermissions(this), 1)
@@ -87,26 +83,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.app_menu, menu)
         val menuItem: MenuItem
         when (mainViewModel.sortingBy) {
             Comparation.BY_NAME -> {
                 menuItem = menu.findItem(R.id.menu_sort_by_name)
             }
+
             Comparation.BY_SIZE -> {
                 menuItem = menu.findItem(R.id.menu_sort_by_size)
             }
+
             Comparation.BY_EXTENSION -> {
                 menuItem = menu.findItem(R.id.menu_sort_by_extension)
             }
+
             Comparation.BY_DATE -> {
                 menuItem = menu.findItem(R.id.menu_sort_by_last_edit)
             }
+
             else -> {
                 menuItem = menu.findItem(R.id.menu_sort_by_name)
             }
         }
         menuItem.isChecked = true
-        menuInflater.inflate(R.menu.app_menu, menu)
         return true
     }
 
@@ -191,6 +191,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.quit) {
             finish()
+        }
+
+        if (item.itemId == R.id.sorting) {
+            return true
         }
 
         val x: Int = when (item.itemId) {

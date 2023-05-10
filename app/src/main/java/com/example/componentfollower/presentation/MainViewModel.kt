@@ -22,6 +22,7 @@ import com.example.componentfollower.util.comparators.FilesByDirectoryComparator
 import com.example.componentfollower.util.comparators.FilesByExtensionComparator
 import com.example.componentfollower.util.comparators.FilesByNameComparator
 import com.example.componentfollower.util.comparators.FilesBySizeComparator
+import com.example.componentfollower.util.comparators.SORTING_KEY
 import com.example.componentfollower.util.comparators.dataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +56,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     init {
         viewModelScope.launch {
             app.dataStore.data.collect { preferences ->
-                sortingBy = preferences[intPreferencesKey("sortingPreferencesKey")] ?: 0
+                sortingBy = preferences[intPreferencesKey(SORTING_KEY)] ?: 0
+                updateShownFiles(currentDirectory)
             }
         }
     }
@@ -122,6 +124,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun updateShownFiles(file: File) {
+        _uiStateFlow.value = UIStates.Loading
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
             &&
