@@ -7,7 +7,7 @@
     tools:context=".presentation.MainActivity">
 
     <androidx.constraintlayout.widget.Group
-        android:id="@+id/permissions_rationale_group"
+        android:id="@+id/permissions_denied_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="
@@ -15,20 +15,35 @@
         request_permissions_button,
         permissions_rationale_text" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/empty_folder_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="
+        empty_folder_image_view,
+        empty_folder_text_view" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/system_folder_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="
+        system_folder_image_view,
+        system_folder_text_view" />
+
     <androidx.recyclerview.widget.RecyclerView
-        tools:listitem="@layout/file_list_item"
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/file_list_item" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,5 +83,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/request_permissions_button" />
+
+    <ImageView
+        android:id="@+id/empty_folder_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/empty_folder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/empty_folder_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/folder_is_empty"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/empty_folder_image_view" />
+
+    <ImageView
+        android:id="@+id/system_folder_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/system_folder"
+        app:layout_constraintBottom_toBottomOf="@id/system_folder_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/system_folder_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:text="@string/system_folder_rationale"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/system_folder_image_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

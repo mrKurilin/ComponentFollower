@@ -1,61 +1,101 @@
 package com.example.componentfollower.presentation
 
 import android.app.Activity
+import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.componentfollower.ComponentFollowerApp
 import com.example.componentfollower.PermissionsChecker
+import com.example.componentfollower.domain.model.FileToShow
+import com.example.componentfollower.util.comparators.Comparation
+import com.example.componentfollower.util.comparators.FilesByDateComparator
+import com.example.componentfollower.util.comparators.FilesByDirectoryComparator
+import com.example.componentfollower.util.comparators.FilesByExtensionComparator
+import com.example.componentfollower.util.comparators.FilesByNameComparator
+import com.example.componentfollower.util.comparators.FilesBySizeComparator
+import com.example.componentfollower.util.comparators.dataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 
-class MainViewModel {
+class MainViewModel(app: Application) : AndroidViewModel(app) {
+
+    private val componentFollowerApp = app as ComponentFollowerApp
+    private val fileConverter = componentFollowerApp.fileConverter
+    val fileIconResourceProvider = componentFollowerApp.fileIconResourceProvider
 
     private val rootDirectory = Environment.getExternalStorageDirectory()
 
     private val _uiStateFlow = MutableStateFlow<UIStates>(UIStates.Loading)
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
-    private val _currentDirectoryFlow = MutableStateFlow<File>(rootDirectory)
+    private var currentDirectory = rootDirectory
 
-    private val _filesFlow = MutableStateFlow<List<File>>(
-        rootDirectory.listFiles()?.toList() ?: listOf()
+    private val _filesFlow = MutableStateFlow(
+        rootDirectory.listFiles()?.map {
+            fileConverter.convertToFileToShow(it)
+        } ?: listOf()
     )
     val filesFlow = _filesFlow.asStateFlow()
 
-    val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
     private val permissionsChecker = PermissionsChecker()
 
+    var sortingBy: Int = 0
+
+    init {
+        viewModelScope.launch {
+            app.dataStore.data.collect { preferences ->
+                sortingBy = preferences[intPreferencesKey("sortingPreferencesKey")] ?: 0
+            }
+        }
+    }
+
     fun onBackPressed() {
-        if (_currentDirectoryFlow.value == rootDirectory) {
+        _uiStateFlow.value = UIStates.Loading
+
+        if (currentDirectory == rootDirectory) {
             _uiStateFlow.value = UIStates.Finish
-        } else {
-            val files = _currentDirectoryFlow.value.parentFile?.listFiles()?.toList() ?: listOf()
-            _currentDirectoryFlow.value = _currentDirectoryFlow.value.parentFile as File
-            _filesFlow.value = files
+        } else if (currentDirectory.parentFile != null) {
+            val parentFile = currentDirectory.parentFile!!
+            currentDirectory = parentFile
+            updateShownFiles(parentFile)
         }
     }
 
     fun checkPermissions(activity: Activity) {
         _uiStateFlow.value = UIStates.Loading
+
         val deniedPermissions = permissionsChecker.getDeniedPermissions(activity)
+
         if (deniedPermissions.isEmpty()) {
-            _uiStateFlow.value = UIStates.PermissionsGranted
+            updateShownFiles(currentDirectory)
+        } else if (
+            permissionsChecker.isSomePermissionSetToNeverAskAgain(activity, deniedPermissions)
+        ) {
+            _uiStateFlow.value = UIStates.SomePermissionSetToNeverAskAgain
         } else {
-            _uiStateFlow.value = UIStates.PermissionsDenied(deniedPermissions)
+            _uiStateFlow.value = UIStates.PermissionsDenied
         }
     }
 
-    fun openFile(file: File, activity: Activity) {
+    fun openFile(fileToShow: FileToShow, activity: Activity) {
+        _uiStateFlow.value = UIStates.Loading
+
+        val file = File(fileToShow.path)
+
         if (file.isDirectory) {
-            _currentDirectoryFlow.value = file
-            _filesFlow.value = file.listFiles()?.toList() ?: listOf()
+            currentDirectory = file
+            updateShownFiles(file)
             return
         }
 
@@ -68,7 +108,7 @@ class MainViewModel {
             FileProvider.getUriForFile(
                 activity,
                 activity.applicationContext.packageName + ".provider",
-                file
+                File(file.path)
             ),
             mimeType
         )
@@ -79,6 +119,49 @@ class MainViewModel {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(activity, "Невозможно открыть файл", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun updateShownFiles(file: File) {
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+            &&
+            (file.path == rootDirectory.path + "/Android/data"
+                    ||
+                    file.path == rootDirectory.path + "/Android/obb")
+        ) {
+            _uiStateFlow.value = UIStates.SystemFolder
+            return
+        }
+
+        val filesList = file.listFiles()?.sortedWith(
+            when (sortingBy) {
+                Comparation.BY_DATE -> {
+                    FilesByDateComparator()
+                }
+
+                Comparation.BY_EXTENSION -> {
+                    FilesByExtensionComparator()
+                }
+
+                Comparation.BY_SIZE -> {
+                    FilesBySizeComparator()
+                }
+
+                else -> {
+                    FilesByNameComparator()
+                }
+            }
+        )?.sortedWith(FilesByDirectoryComparator())?.map {
+            fileConverter.convertToFileToShow(it)
+        } ?: listOf()
+
+        if (filesList.isEmpty()) {
+            _uiStateFlow.value = UIStates.EmptyFolder
+            return
+        }
+
+        _filesFlow.value = filesList
+        _uiStateFlow.value = UIStates.FilesLoaded
     }
 
     fun deniedPermissions(context: Context): Array<String> {

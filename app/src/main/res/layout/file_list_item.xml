@@ -51,15 +51,6 @@
         app:layout_constraintTop_toBottomOf="@id/file_name"
         tools:text="2.00 mb" />
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/file_size"
-        app:layout_constraintEnd_toEndOf="@id/file_size"
-        app:layout_constraintStart_toStartOf="@id/file_size"
-        app:layout_constraintTop_toTopOf="@id/file_size" />
-
     <TextView
         android:id="@+id/file_date"
         android:layout_width="wrap_content"

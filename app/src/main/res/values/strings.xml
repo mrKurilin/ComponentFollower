@@ -7,6 +7,15 @@
     %1$s
     </string>
     <string name="open_settings">Открыть настройки</string>
+    <string name="folder_is_empty">Папка пуста</string>
+    <string name="open_files_app">Открыть приложение Файлы</string>
+    <string name="system_folder_rationale">Содержимое этой папки не может быть отображено здесь из-за ограничений Android</string>
+    <string name="quit">Выйти</string>
+    <string name="action_sort_by_name">Сортировать по имени</string>
+    <string name="action_sort_by_last_edit">Сортировать по дате изменения</string>
+    <string name="action_sort_by_size">Сортировать по размеру</string>
+    <string name="action_sort_by_extension">Сортировать по типу файла</string>
+    <string name="sort_by">Сортировать по</string>
 
     <plurals name="files">
         <item quantity="one">%1$d файл</item>

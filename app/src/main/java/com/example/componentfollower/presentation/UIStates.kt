@@ -2,11 +2,17 @@ package com.example.componentfollower.presentation
 
 sealed class UIStates {
 
-    class PermissionsDenied(val deniedPermissions: Array<String>) : UIStates()
+    object PermissionsDenied : UIStates()
 
     object Loading : UIStates()
 
-    object PermissionsGranted : UIStates()
+    object FilesLoaded : UIStates()
+
+    object EmptyFolder : UIStates()
+
+    object SystemFolder : UIStates()
+
+    object SomePermissionSetToNeverAskAgain : UIStates()
 
     object Finish : UIStates()
 }

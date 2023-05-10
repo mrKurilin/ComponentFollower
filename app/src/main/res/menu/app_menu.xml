@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sorting"
+        android:title="@string/sort_by">
+        <menu>
+            <group
+                android:id="@+id/sort_group"
+                android:checkableBehavior="single"
+                android:icon="@drawable/baseline_sort_24">
+                <item
+                    android:id="@+id/menu_sort_by_name"
+                    android:title="@string/action_sort_by_name" />
+                <item
+                    android:id="@+id/menu_sort_by_last_edit"
+                    android:title="@string/action_sort_by_last_edit" />
+                <item
+                    android:id="@+id/menu_sort_by_size"
+                    android:title="@string/action_sort_by_size" />
+                <item
+                    android:id="@+id/menu_sort_by_extension"
+                    android:title="@string/action_sort_by_extension" />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/quit"
+        android:title="@string/quit">
+    </item>
+</menu>

@@ -1,25 +1,23 @@
 package com.example.componentfollower.presentation
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import java.io.File
-import java.text.SimpleDateFormat
+import com.example.componentfollower.domain.model.FileToShow
 
 class FilesRecyclerViewAdapter(
-    private val simpleDateFormat: SimpleDateFormat,
-    private val openFile: (File) -> Unit,
+    private val openFile: (FileToShow) -> Unit,
+    private val fileIconResourceProvider: FileIconResourceProvider,
 ) : RecyclerView.Adapter<FileViewHolder>() {
 
-    private var files = listOf<File>()
+    private var files = listOf<FileToShow>()
 
     override fun getItemCount(): Int = files.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {
-        val fileViewHolder = FileViewHolder(
-            parent = parent,
-            simpleDateFormat = simpleDateFormat
-        )
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): FileViewHolder {
+        val fileViewHolder = FileViewHolder(parent)
 
         fileViewHolder.binding.root.setOnClickListener {
             val file = files[fileViewHolder.adapterPosition]
@@ -30,17 +28,15 @@ class FilesRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
-        holder.bind(files[position])
+        val file = files[position]
+        holder.bind(
+            file,
+            fileIconResourceProvider.provideByExtension(file)
+        )
     }
 
-    fun setItems(files: List<File>) {
-        val diffResult = DiffUtil.calculateDiff(
-            DiffUtilCallback(
-                this.files,
-                files,
-            )
-        )
+    fun setItems(files: List<FileToShow>) {
         this.files = files
-        diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
     }
 }
