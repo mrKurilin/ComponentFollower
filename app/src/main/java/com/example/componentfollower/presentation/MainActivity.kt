@@ -71,8 +71,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
         binding.exitButton.setOnClickListener {
             finish()
         }
@@ -85,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
         val menuItem: MenuItem
-        when (mainViewModel.sortingBy) {
+        when (mainViewModel.sortBy) {
             Comparation.BY_NAME -> {
                 menuItem = menu.findItem(R.id.menu_sort_by_name)
             }
@@ -116,7 +114,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.permissions_rationale,
                 mainViewModel.deniedPermissions(this).joinToString("/n")
             )
-            binding.permissionsDeniedGroup.visibility = View.INVISIBLE
+            binding.permissionsDeniedGroup.visibility = View.VISIBLE
 
             binding.progressBar.visibility = View.INVISIBLE
             binding.emptyFolderGroup.visibility = View.INVISIBLE

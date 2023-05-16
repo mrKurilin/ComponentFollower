@@ -17,11 +17,7 @@ import com.example.componentfollower.ComponentFollowerApp
 import com.example.componentfollower.PermissionsChecker
 import com.example.componentfollower.domain.model.FileToShow
 import com.example.componentfollower.util.comparators.Comparation
-import com.example.componentfollower.util.comparators.FilesByDateComparator
 import com.example.componentfollower.util.comparators.FilesByDirectoryComparator
-import com.example.componentfollower.util.comparators.FilesByExtensionComparator
-import com.example.componentfollower.util.comparators.FilesByNameComparator
-import com.example.componentfollower.util.comparators.FilesBySizeComparator
 import com.example.componentfollower.util.comparators.SORTING_KEY
 import com.example.componentfollower.util.comparators.dataStore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,12 +47,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val permissionsChecker = PermissionsChecker()
 
-    var sortingBy: Int = 0
+    var sortBy: Int = 0
 
     init {
         viewModelScope.launch {
             app.dataStore.data.collect { preferences ->
-                sortingBy = preferences[intPreferencesKey(SORTING_KEY)] ?: 0
+                sortBy = preferences[intPreferencesKey(SORTING_KEY)] ?: 0
                 updateShownFiles(currentDirectory)
             }
         }
@@ -137,21 +133,21 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         val filesList = file.listFiles()?.sortedWith(
-            when (sortingBy) {
+            when (sortBy) {
                 Comparation.BY_DATE -> {
-                    FilesByDateComparator()
+                    componentFollowerApp.filesByDateComparator
                 }
 
                 Comparation.BY_EXTENSION -> {
-                    FilesByExtensionComparator()
+                    componentFollowerApp.filesByExtensionComparator
                 }
 
                 Comparation.BY_SIZE -> {
-                    FilesBySizeComparator()
+                    componentFollowerApp.filesBySizeComparator
                 }
 
                 else -> {
-                    FilesByNameComparator()
+                    componentFollowerApp.filesByNameComparator
                 }
             }
         )?.sortedWith(FilesByDirectoryComparator())?.map {
